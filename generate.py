@@ -30,7 +30,7 @@ def process_keys(f, as_list=True):
 def generate():
     f = open('docker-compose.yml', 'w')
     f.write(BIOS_DOCKER_COMPOSE)
-    d = '/data/bios-node'
+    d = './data/bios-node'
     if not os.path.exists(d):
         os.mkdir(d)
 
@@ -45,13 +45,13 @@ def generate():
     copyfile('./genesis.json', dest_genesis)
     config_dest = os.path.join(d, 'config.ini')
     config_tmpl = open('./config.ini').read()
-    peers = ['p2p-peer-address = %s:9876' % IP]
+    peers = []
     bios_keys = process_keys('bios_keys')
     config = config_tmpl.format(bp_name='eosio', port='9876', key=bios_keys[0], peers='\n'.join(peers), stale_production='true')
     config += '\nhttp-server-address = 0.0.0.0:8888'
     with open(config_dest, 'w') as dest:
         dest.write(config)
-     
+    peers = ['p2p-peer-address = %s:9876' % IP]
     tmpl = open('docker-compose-tmpl').read()
     keys = process_keys('bp_keys')
 
@@ -66,7 +66,7 @@ def generate():
         bp_name = ''.join([m[char] if char in m.keys() else char for char in 'bp%d' % i])
         prods.append(bp_name)
         line = tmpl.format(index=i, port=port)
-        d = '/data/eos-bp{index}'.format(index=i)
+        d = './data/eos-bp{index}'.format(index=i)
         if not os.path.exists(d):
             os.mkdir(d)
         f.write(line)
@@ -82,6 +82,10 @@ def generate():
         reg_script.write(cmd_wrapper(cmd.format(pub=pub, bp_name=bp_name)))
         with open(config_dest, 'w') as dest:
             dest.write(config)
+            if len(peers) >= 2:
+                peers.reverse()
+                peers.pop()
+                peers.reverse()
         peers.append('%s:%d' % (peer_prefix, port))
         port -= 1
     f.close()

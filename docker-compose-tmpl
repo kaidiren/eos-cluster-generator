@@ -1,6 +1,6 @@
   nodeosd{index}:
     image: heipacker2016/eos:v1.0.1-unstake-5-mins-eos
-    command: nodeosd.sh --data-dir /opt/eosio/bin/data-dir --genesis-json /opt/eosio/bin/data-dir/genesis.json --replay-blockchain
+    command: nodeosd.sh --data-dir /opt/eosio/bin/data-dir --genesis-json /opt/eosio/bin/data-dir/genesis.json
     hostname: nodeosd
     container_name: nodeosd{index}
     ports:
@@ -8,4 +8,4 @@
     expose:
       - "{port}"
     volumes:
-      - /data/eos-bp{index}/:/opt/eosio/bin/data-dir
+      - ./data/eos-bp{index}/:/opt/eosio/bin/data-dir
